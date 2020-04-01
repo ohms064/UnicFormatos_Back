@@ -11,40 +11,49 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace unicformatos
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
+namespace unicformatos {
+
+    public class Startup {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+        public Startup (IConfiguration configuration) {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers();
+        public void ConfigureServices (IServiceCollection services) {
+
+            services.AddCors (options => {
+                options.AddPolicy (MyAllowSpecificOrigins,
+                    builder => { //TODO: Checar como definir un sitio en específico, seguro ésto es inseguro.
+                        //builder.WithOrigins ("http://localhost:5001");
+                        builder.AllowAnyOrigin ()
+                            .AllowAnyMethod ()
+                            .AllowAnyHeader ();
+                    });
+            });
+
+            services.AddControllers ();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
+        public void Configure (IApplicationBuilder app, IWebHostEnvironment env) {
+            if (env.IsDevelopment ()) {
+                app.UseDeveloperExceptionPage ();
             }
 
-            app.UseHttpsRedirection();
+            app.UseCors (MyAllowSpecificOrigins);
 
-            app.UseRouting();
+            app.UseHttpsRedirection ();
 
-            app.UseAuthorization();
+            app.UseRouting ();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
+            app.UseAuthorization ();
+
+            app.UseEndpoints (endpoints => {
+                endpoints.MapControllers ();
             });
         }
     }

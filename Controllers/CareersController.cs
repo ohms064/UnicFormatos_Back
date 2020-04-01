@@ -9,7 +9,7 @@ namespace UnicFormatos.Controllers {
     [Route ("test")]
     public class CareersController : Controller {
 
-        [HttpPut]
+        [HttpPost]
         public IActionResult PutdotInscripcion ([FromBody] Inscripcion data) {
             System.Console.WriteLine ($"Received data!");
             if (data == null) return BadRequest ();
